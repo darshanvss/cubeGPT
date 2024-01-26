@@ -7,7 +7,8 @@ const OAuthConfig = {
   redirectUri: import.meta.env.VITE_OAUTH_REDIRECT_URI,
   authorizationEndpoint: 'https://www.worldcubeassociation.org/oauth/authorize',
   tokenEndpoint: 'https://www.worldcubeassociation.org/oauth/token',
-  userProfileEndPoint: 'https://www.worldcubeassociation.org/api/v0/me'
+  userProfileEndPoint: 'https://www.worldcubeassociation.org/api/v0/me',
+  statsEndpoint: 'https://statistics-api.worldcubeassociation.org/database/query'
 }
 
 export const authenticate = async () => {
@@ -43,9 +44,6 @@ export const handleAuthenticationCallback = async () => {
     .then((response) => {
       // Log the response from the user profile endpoint
       console.log('User Profile Response:', response.data)
-
-      // Perform any other actions as needed with the user profile data
-      // ...
     })
     .catch((error) => {
       console.error('Error fetching user profile:', error)
