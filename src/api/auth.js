@@ -24,13 +24,23 @@ export const authenticate = async () => {
 export const handleAuthenticationCallback = async (code) => {
   try {
     // Exchange the authorization code for an access token
-    const response = await axios.post(OAuthConfig.tokenEndpoint, {
-      client_id: OAuthConfig.clientId,
-      client_secret: OAuthConfig.clientSecret,
-      redirect_uri: OAuthConfig.redirectUri,
-      code,
-      grant_type: 'authorization_code'
-    })
+    const response = await axios.post(
+      OAuthConfig.tokenEndpoint,
+      {
+        client_id: OAuthConfig.clientId,
+        client_secret: OAuthConfig.clientSecret,
+        redirect_uri: OAuthConfig.redirectUri,
+        code,
+        grant_type: 'authorization_code'
+      },
+      {
+        // Add the mode: 'cors' option to handle CORS
+        mode: 'cors',
+        headers: {
+          'Access-Control-Allow-Origin': '*'
+        }
+      }
+    )
 
     const accessToken = response.data.access_token
 
