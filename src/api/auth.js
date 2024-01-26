@@ -1,4 +1,5 @@
 import axios from 'axios'
+import router from '@/router'
 
 const OAuthConfig = {
   // Replace these values with your OAuth provider's configuration
@@ -44,6 +45,7 @@ export const handleAuthenticationCallback = async () => {
     .then((response) => {
       // Log the response from the user profile endpoint
       console.log('User Profile Response:', response.data)
+      router.push({ name: 'chat' })
     })
     .catch((error) => {
       console.error('Error fetching user profile:', error)
