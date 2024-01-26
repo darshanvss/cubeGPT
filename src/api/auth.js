@@ -6,13 +6,14 @@ const OAuthConfig = {
   clientSecret: import.meta.env.VITE_OAUTH_CLIENT_SECRET,
   redirectUri: import.meta.env.VITE_OAUTH_REDIRECT_URI,
   authorizationEndpoint: 'https://www.worldcubeassociation.org/oauth/authorize',
-  tokenEndpoint: 'https://www.worldcubeassociation.org/oauth/token'
+  tokenEndpoint: 'https://www.worldcubeassociation.org/oauth/token',
+  userProfileEndPoint: 'https://www.worldcubeassociation.org/api/v0/me'
 }
 
 export const authenticate = async () => {
   try {
     // Construct the authorization URL
-    const authorizationUrl = `${OAuthConfig.authorizationEndpoint}?client_id=${OAuthConfig.clientId}&redirect_uri=${OAuthConfig.redirectUri}&response_type=code`
+    const authorizationUrl = `${OAuthConfig.authorizationEndpoint}?client_id=${OAuthConfig.clientId}&redirect_uri=${OAuthConfig.redirectUri}&response_type=token`
 
     // Redirect the user to the authorization URL
     window.location.href = authorizationUrl
@@ -21,37 +22,32 @@ export const authenticate = async () => {
   }
 }
 
-export const handleAuthenticationCallback = async (code) => {
-  try {
-    // Exchange the authorization code for an access token
-    const response = await axios.post(
-      OAuthConfig.tokenEndpoint,
-      {
-        client_id: OAuthConfig.clientId,
-        client_secret: OAuthConfig.clientSecret,
-        redirect_uri: OAuthConfig.redirectUri,
-        code,
-        grant_type: 'authorization_code'
-      },
-      {
-        // Add the mode: 'cors' option to handle CORS
-        mode: 'cors',
-        headers: {
-          'Access-Control-Allow-Origin': '*'
-        }
+export const handleAuthenticationCallback = async () => {
+  // Retrieve values from local storage
+  const accessToken = localStorage.getItem('access_token')
+  const tokenType = localStorage.getItem('token_type')
+  const expiresIn = localStorage.getItem('expires_in')
+
+  // Log the retrieved values
+  console.log('Retrieved Access Token:', accessToken)
+  console.log('Retrieved Token Type:', tokenType)
+  console.log('Retrieved Expires In:', expiresIn)
+
+  // Make an Axios call to the user profile endpoint using the access token
+  axios
+    .get(OAuthConfig.userProfileEndPoint, {
+      headers: {
+        Authorization: `${tokenType} ${accessToken}`
       }
-    )
+    })
+    .then((response) => {
+      // Log the response from the user profile endpoint
+      console.log('User Profile Response:', response.data)
 
-    const accessToken = response.data.access_token
-
-    // Use the access token as needed (e.g., store it in Vuex, make API requests)
-    if (accessToken) {
-      console.log('Access token:', accessToken)
-      // You may want to store the token in a global state (e.g., Vuex) or use it for API requests
-    } else {
-      console.error('Authentication failed')
-    }
-  } catch (error) {
-    console.error('Authentication callback error:', error)
-  }
+      // Perform any other actions as needed with the user profile data
+      // ...
+    })
+    .catch((error) => {
+      console.error('Error fetching user profile:', error)
+    })
 }
